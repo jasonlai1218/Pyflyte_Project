@@ -2,6 +2,8 @@
 
 import typing
 from flytekit import task, workflow
+from datetime import datetime
+from flytekit import workflow, LaunchPlan, CronSchedule
 
 
 @task
@@ -37,6 +39,15 @@ def wf(name: str = "union") -> typing.Tuple[str, int]:
     greeting = say_hello(name=name)
     greeting_len = greeting_length(greeting=greeting)
     return greeting, greeting_len
+
+process_data_lp = LaunchPlan.get_or_create(
+    wf,
+    name="process_data_lp",
+    schedule=CronSchedule(
+        schedule="0 * * * *",
+        kickoff_time_input_arg="kickoff_time",
+    )
+)
 
 
 if __name__ == "__main__":
